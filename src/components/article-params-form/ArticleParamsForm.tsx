@@ -1,6 +1,6 @@
 import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { Text } from '../text';
 import { Spacing } from '../spacing';
@@ -22,16 +22,39 @@ import styles from './ArticleParamsForm.module.scss';
 
 interface ArticleParamsFormProps {
 	articleState: ArticleStateType;
+	isOpen: boolean;
+	setIsOpen: (arg: boolean) => void;
 	onChange: (changedArticleState: ArticleStateType) => void;
 	onReset: (e: React.FormEvent<HTMLButtonElement>)  => void;
 }
 
-export const ArticleParamsForm = ({articleState, onChange, onReset}: ArticleParamsFormProps) => {
-	
+export const ArticleParamsForm = ({articleState, onChange, onReset, isOpen, setIsOpen}: ArticleParamsFormProps) => {
 
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const formRef = useRef<HTMLDivElement>(null);
 
-	
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+			isOpen &&
+			formRef.current &&
+			!formRef.current.contains(event.target as Node)
+			) {
+			toggleOpen();
+			}
+		  };
+		  document.addEventListener('mousedown', handleClickOutside);
+		  return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, [isOpen])
+
+	useEffect(() => {
+		console.log("изменения в состоянии")
+		setFamilyValue(articleState.fontFamilyOption);
+		setFontSizeValue(articleState.fontSizeOption);
+		setFontColorValue(articleState.fontColor);
+		setBackgroundColorValue(articleState.backgroundColor);
+		setContentWidthValue(articleState.contentWidth);
+	}, [articleState])
+
 	const toggleOpen = () => {
 		console.log("openState is changed");
 		setIsOpen(isOpen ? false : true);
@@ -49,7 +72,6 @@ export const ArticleParamsForm = ({articleState, onChange, onReset}: ArticlePara
 		})
 		setIsOpen(false)
 		console.log("нажали применить")
-
 	}
 
 	/* описываем состояние каждого элемента */
@@ -66,7 +88,8 @@ export const ArticleParamsForm = ({articleState, onChange, onReset}: ArticlePara
 			<ArrowButton state={isOpen} onClick={toggleOpen}/>
 			<aside
 				/* показываем боковое меню в зависимости от состояния */
-				className={clsx(styles.container, isOpen ? styles.container_open : null)}>
+				ref = {formRef}
+				className={clsx(styles.container, isOpen ? styles.container_open : null)} onClick={(e) => e.stopPropagation()}>
 				<form className={styles.form}>
 					
 					<Text
@@ -106,7 +129,7 @@ export const ArticleParamsForm = ({articleState, onChange, onReset}: ArticlePara
 					<Select
 						selected={backgroundColorState}
 						options={backgroundColors}
-						onChange={() => {setBackgroundColorValue}}
+						onChange={setBackgroundColorValue}
 						title='Цвет фона'
 					/>
 					<Spacing size={50}/>

@@ -15,15 +15,9 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 	/* состояние страницы */
 	const [articleState, setArticleState] = useState(defaultArticleState);
-
-	/* состояния страницы */
-	const [fontFamilyValue, setFontFamilyValue] = useState(defaultArticleState.fontFamilyOption.value);
-	const [fontColorValue, setFontColorValue] = useState(defaultArticleState.fontColor.value);
-	const [backgroundColorValue, setBackgroundColorValue] = useState(defaultArticleState.backgroundColor.value);
-	const [contentWidthValue, setContentWidthValue] = useState(defaultArticleState.contentWidth.value);
-	const [fontSizeValue, setFontSizeValue] = useState(defaultArticleState.fontSizeOption.value);
 
 
 	const getCurrentStyles = () => {
@@ -41,13 +35,13 @@ const App = () => {
 		<div
 			className={clsx(styles.main)}
 			style={getCurrentStyles()}>
-			<ArticleParamsForm 	articleState={articleState} onChange={
+			<ArticleParamsForm 	articleState={articleState} isOpen={isOpen} setIsOpen={setIsOpen} onChange={
 					(changedArticleState: ArticleStateType) => {
 						console.log("articleState is changed")
 						setArticleState(changedArticleState);
 					}
 				} onReset={(e: React.FormEvent<HTMLButtonElement>) => {
-					e.preventDefault()
+					
 					setArticleState(defaultArticleState)}}/>
 			<Article />
 		</div>
