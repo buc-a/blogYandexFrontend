@@ -21,6 +21,7 @@ type SelectProps = {
 	title?: string;
 };
 
+/* Элемент выбора из набора опций */
 export const Select = (props: SelectProps) => {
 	const { options, placeholder, selected, onChange, onClose, title } = props;
 	const [isOpen, setIsOpen] = useState<boolean>(false);

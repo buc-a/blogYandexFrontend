@@ -1,6 +1,6 @@
 import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { clsx } from 'clsx';
 import { Text } from '../text';
 import { Spacing } from '../spacing';
@@ -23,23 +23,34 @@ import styles from './ArticleParamsForm.module.scss';
 interface ArticleParamsFormProps {
 	articleState: ArticleStateType;
 	onChange: (changedArticleState: ArticleStateType) => void;
+	onReset: (e: React.FormEvent<HTMLButtonElement>)  => void;
 }
 
-export const ArticleParamsForm = ({articleState, onChange}: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({articleState, onChange, onReset}: ArticleParamsFormProps) => {
+	
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
-	/* будет выполняться при каждом изменении формата статьи */
-	useEffect(() =>
-	{
-		console.log("articleState is changed")
-		setIsOpen(false)
-	}, [articleState])
-
+	
 	const toggleOpen = () => {
 		console.log("openState is changed");
 		setIsOpen(isOpen ? false : true);
 	};
+
+	/* при применении изменений к статье */
+	const applyChanges = (e: React.FormEvent<HTMLButtonElement>) => {
+		e.preventDefault(); 
+		onChange({
+			fontFamilyOption: fontFamilyState,
+			fontColor: fontColorState,
+			backgroundColor: backgroundColorState,
+			contentWidth: contentWidthState,
+			fontSizeOption: fontSizeState
+		})
+		setIsOpen(false)
+		console.log("нажали применить")
+
+	}
 
 	/* описываем состояние каждого элемента */
 	const [fontFamilyState, setFamilyValue] = useState<OptionType>(articleState.fontFamilyOption);
@@ -48,6 +59,8 @@ export const ArticleParamsForm = ({articleState, onChange}: ArticleParamsFormPro
 	const [backgroundColorState, setBackgroundColorValue] = useState<OptionType>(articleState.backgroundColor);
 	const [contentWidthState, setContentWidthValue] = useState<OptionType>(articleState.contentWidth);
 
+
+
 	return (
 		<>
 			<ArrowButton state={isOpen} onClick={toggleOpen}/>
@@ -55,7 +68,7 @@ export const ArticleParamsForm = ({articleState, onChange}: ArticleParamsFormPro
 				/* показываем боковое меню в зависимости от состояния */
 				className={clsx(styles.container, isOpen ? styles.container_open : null)}>
 				<form className={styles.form}>
-					<div className={styles.bottomContainer}>
+					
 					<Text
 						size={31}
 						weight={800}
@@ -66,10 +79,11 @@ export const ArticleParamsForm = ({articleState, onChange}: ArticleParamsFormPro
 					</Text>
 					<Spacing size={50}/>
 					<Select
+						/* что выбрано? из чего выбирать? что делаь при изменении? */
 						selected={fontFamilyState}
 						options={fontFamilyOptions}
 						onChange={setFamilyValue}
-						title='ШРИФТ'
+						title='Стиль шрифта'
 					/>
 					<Spacing size={50}/>
 					<RadioGroup
@@ -77,14 +91,14 @@ export const ArticleParamsForm = ({articleState, onChange}: ArticleParamsFormPro
 						selected={fontSizeState}
 						options={fontSizeOptions}
 						onChange={setFontSizeValue}
-						title='РАЗМЕР ШРИФТА'
+						title='Размер шрифта'
 					/>
 					<Spacing size={50}/>
 					<Select
 						selected={fontColorState}
 						options={fontColors}
 						onChange={setFontColorValue}
-						title='ЦВЕТ ШРИФТА'
+						title='Цвет шрифта'
 					/>
 					<Spacing size={50}/>
 					<Separator/>
@@ -92,22 +106,25 @@ export const ArticleParamsForm = ({articleState, onChange}: ArticleParamsFormPro
 					<Select
 						selected={backgroundColorState}
 						options={backgroundColors}
-						onChange={setBackgroundColorValue}
-						title='ЦВЕТ ФОНА'
+						onChange={() => {setBackgroundColorValue}}
+						title='Цвет фона'
 					/>
 					<Spacing size={50}/>
 					<Select
 						selected={contentWidthState}
 						options={contentWidthArr}
 						onChange={setContentWidthValue}
-						title='ШИРИНА КОНТЕНТА'
+						title='Ширина'
 					/>
 					<Spacing size={72}/>
+
+					<div className={styles.bottomContainer}>
 						<Button
 							title='Сбросить'
 							type='reset'
+							onClick={onReset}
 						/>
-						<Button title='Применить' type='submit' />
+						<Button title='Применить' type='submit' onClick={(e) => applyChanges(e as React.FormEvent<HTMLButtonElement>)}/>
 					</div>
 				</form>
 			</aside>
